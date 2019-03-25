@@ -11,7 +11,19 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('purjus_loco_importer');
-        
+
+        $rootNode
+            ->children()
+                ->arrayNode('projects')->isRequired()
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('key')->end()
+                            ->scalarNode('file')->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
         return $treeBuilder;
     }
 }

@@ -3,3 +3,4 @@ services:
         class: Purjus\LocoImporterBundle\Command\ImportTranslationsCommand
         arguments:
             - '%kernel.root_dir%'
+        tags: ['console.command']

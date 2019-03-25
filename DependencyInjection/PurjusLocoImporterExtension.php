@@ -27,6 +27,6 @@ class PurjusLocoImporterExtension extends Extension
 
         $container
             ->getDefinition('purjus_loco_importer.command')
-            ->addArgument($config);
+            ->addArgument($config['projects']);
     }
 }

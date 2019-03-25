@@ -8,14 +8,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportTranslationsCommand extends Command
 {
-    private $locoTranslationsApiKeys;
+    private $files;
     private $kernelRootDir;
+    private $output;
 
-    public function __construct(string $kernelRootDir, array $locoTranslationsApiKeys)
+    public function __construct(string $kernelRootDir, array $files)
     {
         parent::__construct();
         $this->kernelRootDir = $kernelRootDir;
-        $this->locoTranslationsApiKeys = $locoTranslationsApiKeys;
+        $this->files = $files;
     }
 
     protected function configure()
@@ -27,9 +28,11 @@ class ImportTranslationsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
+
         $output->writeln('Getting translations...');
 
-        foreach ($this->locoTranslationsApiKeys as $project => $translationConfig) {
+        foreach ($this->files as $project => $translationConfig) {
             $output->writeln(sprintf('Getting translations for %s', $project));
             $this->handleConfig($translationConfig);
         }
@@ -41,19 +44,20 @@ class ImportTranslationsCommand extends Command
     {
         $locales = $this->getLocales($translationConfig['key']);
 
-        $this->writeln(sprintf('%d locales found', count($locales)));
+        $this->output->writeln(sprintf('%d locales found', count($locales)));
 
         foreach ($locales as $locale) {
             $this->handleLocale($translationConfig['key'], $locale['code'], $translationConfig['file']);
         }
     }
 
-    private function requestLoco(string $apiKey, string $url): Client
+    private function requestLoco(string $apiKey, string $url): string
     {
-        $auth = base64_encode($url.':');
+        $auth = base64_encode($apiKey.':');
         $context = stream_context_create([
             'http' => ['header' => 'Authorization: Basic '.$auth],
         ]);
+
         return file_get_contents('https://localise.biz/api/'.ltrim($url, '/'), false, $context);
     }
 
@@ -70,7 +74,7 @@ class ImportTranslationsCommand extends Command
 
     private function handleLocale(string $apiKey, string $localeCode, string $file)
     {
-        $this->writeln(sprintf('Handling locale "%s"', $localeCode));
+        $this->output->writeln(sprintf('Handling locale "%s"', $localeCode));
 
         $translationContent = $this->requestLoco($apiKey, sprintf('export/locale/%s.yml?format=symfony', $localeCode));
 
@@ -78,6 +82,6 @@ class ImportTranslationsCommand extends Command
 
         file_put_contents($filePath, $translationContent);
 
-        $this->writeln(sprintf('File "%s" overriden', $filePath));
+        $this->output->writeln(sprintf('File "%s" overriden', $filePath));
     }
 }
