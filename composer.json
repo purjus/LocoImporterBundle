@@ -1,12 +1,20 @@
 {
     "name": "purjus/loco-importer-bundle",
     "description": "Import translations from localise.biz (loco)",
-    "type": "library",
+    "type": "symfony-bundle",
+    "license": "MIT",
     "authors": [
         {
             "name": "Rémi Garcia",
             "email": "r.garcia@purjus.fr"
         }
     ],
-    "require": {}
+    "require": {
+        "symfony/framework-bundle": "~2.7|~3.1|~4.0",
+        "symfony/console": "~2.7|~3.1|~4.0",
+        "symfony/translation":  "~2.7|~3.1|~4.0"
+    },
+    "autoload": {
+        "psr-4": { "Purjus\\LocoImporterBundle\\": "" }
+    }
 }
