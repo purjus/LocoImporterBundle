@@ -1,0 +1,12 @@
+{
+    "name": "purjus/loco-importer-bundle",
+    "description": "Import translations from localise.biz (loco)",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Rémi Garcia",
+            "email": "r.garcia@purjus.fr"
+        }
+    ],
+    "require": {}
+}
