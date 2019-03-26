@@ -1,6 +1,11 @@
 services:
+    purjus_loco_importer.importer.loco:
+        class: Purjus\LocoImporterBundle\Importer\LocoTranslationImporter
+        arguments:
+            - '%kernel.root_dir%'
+
     purjus_loco_importer.command:
         class: Purjus\LocoImporterBundle\Command\ImportTranslationsCommand
         arguments:
-            - '%kernel.root_dir%'
+            - '@purjus_loco_importer.importer.loco'
         tags: ['console.command']

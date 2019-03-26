@@ -2,21 +2,25 @@
 
 namespace Purjus\LocoImporterBundle\Command;
 
+use Purjus\LocoImporterBundle\Importer\TranslationImporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ImportTranslationsCommand extends Command
 {
-    private $files;
-    private $kernelRootDir;
+    /** @var array */
+    private $projects;
+    /** @var TranslationImporter */
+    private $importer;
+    /** @var OutputInterface */
     private $output;
 
-    public function __construct(string $kernelRootDir, array $files)
+    public function __construct(TranslationImporter $importer, array $projects)
     {
         parent::__construct();
-        $this->kernelRootDir = $kernelRootDir;
-        $this->files = $files;
+        $this->importer = $importer;
+        $this->projects = $projects;
     }
 
     protected function configure()
@@ -32,7 +36,7 @@ class ImportTranslationsCommand extends Command
 
         $output->writeln('Getting translations...');
 
-        foreach ($this->files as $project => $translationConfig) {
+        foreach ($this->projects as $project => $translationConfig) {
             $output->writeln(sprintf('Getting translations for %s', $project));
             $this->handleConfig($translationConfig);
         }
@@ -42,7 +46,7 @@ class ImportTranslationsCommand extends Command
 
     private function handleConfig(array $translationConfig)
     {
-        $locales = $this->getLocales($translationConfig['key']);
+        $locales = $this->importer->getLocales($translationConfig['key']);
 
         $this->output->writeln(sprintf('%d locales found', count($locales)));
 
@@ -51,36 +55,13 @@ class ImportTranslationsCommand extends Command
         }
     }
 
-    private function requestLoco(string $apiKey, string $url): string
-    {
-        $auth = base64_encode($apiKey.':');
-        $context = stream_context_create([
-            'http' => ['header' => 'Authorization: Basic '.$auth],
-        ]);
-
-        return file_get_contents('https://localise.biz/api/'.ltrim($url, '/'), false, $context);
-    }
-
-    private function getLocales(string $apiKey): array
-    {
-        $locales = json_decode($this->requestLoco($apiKey, 'locales'), true);
-
-        if (null === $locales || JSON_ERROR_NONE !== json_last_error()) {
-            return [];
-        }
-
-        return $locales;
-    }
-
     private function handleLocale(string $apiKey, string $localeCode, string $file)
     {
         $this->output->writeln(sprintf('Handling locale "%s"', $localeCode));
 
-        $translationContent = $this->requestLoco($apiKey, sprintf('export/locale/%s.yml?format=symfony', $localeCode));
-
-        $filePath = sprintf('%s/../%s.%s.yml', $this->kernelRootDir, $file, $localeCode);
-
-        file_put_contents($filePath, $translationContent);
+        if (false === ($filePath = $this->importer->importFile($apiKey, $localeCode, $file))) {
+            $this->output->writeln(sprintf('Error while importing file "%s" with locale "%s"', $file, $localeCode));
+        }
 
         $this->output->writeln(sprintf('File "%s" overriden', $filePath));
     }
