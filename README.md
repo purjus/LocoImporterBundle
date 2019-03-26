@@ -52,3 +52,9 @@ purjus_loco_importer:
             file: 'translations/messages' # path to the file, relative to project root, without locale nor extension
             # here, the imported files will go to "translations/messages.<locale>.yaml"
 ```
+
+Use
+============
+
+To import projects translations just use :
+`bin/console purjus:loco:import`
