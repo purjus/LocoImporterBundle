@@ -33,9 +33,16 @@ final class LocoTranslationImporter implements TranslationImporter
         return $locales;
     }
     
-    public function importFile(string $apiKey, string $localeCode, string $file)
+    public function importFile(string $apiKey, string $localeCode, string $file, array $options = [])
     {
         $translationContent = $this->requestLoco($apiKey, sprintf('export/locale/%s.yml?format=symfony', $localeCode));
+
+        if (
+            array_key_exists(TranslationImporter::IMPORT_OPTION_NO_HEADERS, $options) &&
+            $options[TranslationImporter::IMPORT_OPTION_NO_HEADERS]
+        ) {
+            $translationContent = preg_replace('/^\#\ .*\n*/m', '', $translationContent);
+        }
 
         $filePath = sprintf('%s/../%s.%s.yml', $this->kernelRootDir, $file, $localeCode);
         $fileRealPath = realpath($filePath);
