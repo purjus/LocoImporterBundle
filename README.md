@@ -49,8 +49,8 @@ purjus_loco_importer:
     projects:
         my_project_name:
             key: '<localise.biz API Key>'
-            file: 'translations/messages' # path to the file, relative to project root, without locale nor extension
-            # here, the imported files will go to "translations/messages.<locale>.yaml"
+            file: 'translations/messages' # path to the file, relative to project root, without locale nor extension. Here, the imported files will go to "translations/messages.<locale>.yaml"
+            format: 'symfony' # default. Can be : symfony | zend | codeigniter | constants | chrome | nested | rails | java | tizen | jed | gettext | ng-gettext | xcode | script | yml (see https://localise.biz/api/docs/export/exportlocale)
 ```
 
 Use

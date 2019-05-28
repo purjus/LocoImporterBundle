@@ -2,6 +2,7 @@
 
 namespace Purjus\LocoImporterBundle\Command;
 
+use Purjus\LocoImporterBundle\Importer\LocoTranslationImporter;
 use Purjus\LocoImporterBundle\Importer\TranslationImporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,15 +54,15 @@ class ImportTranslationsCommand extends Command
         $this->output->writeln(sprintf('%d locales found', count($locales)));
 
         foreach ($locales as $locale) {
-            $this->handleLocale($translationConfig['key'], $locale['code'], $translationConfig['file'], $options);
+            $this->handleLocale($translationConfig['key'], $locale['code'], $translationConfig['file'], $translationConfig['format'] ?? LocoTranslationImporter::DEFAULT_FORMAT, $options);
         }
     }
 
-    private function handleLocale(string $apiKey, string $localeCode, string $file, array $options = [])
+    private function handleLocale(string $apiKey, string $localeCode, string $file, string $format, array $options = [])
     {
         $this->output->writeln(sprintf('Handling locale "%s"', $localeCode));
 
-        if (false === ($filePath = $this->importer->importFile($apiKey, $localeCode, $file, $options))) {
+        if (false === ($filePath = $this->importer->importFile($apiKey, $localeCode, $file, $format, $options))) {
             $this->output->writeln(sprintf('Error while importing file "%s" with locale "%s"', $file, $localeCode));
         }
 

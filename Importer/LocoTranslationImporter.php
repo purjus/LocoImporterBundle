@@ -4,6 +4,8 @@ namespace Purjus\LocoImporterBundle\Importer;
 
 final class LocoTranslationImporter implements TranslationImporter
 {
+    const DEFAULT_FORMAT = 'symfony';
+    
     /** @var string */
     private $kernelRootDir;
     
@@ -33,9 +35,12 @@ final class LocoTranslationImporter implements TranslationImporter
         return $locales;
     }
     
-    public function importFile(string $apiKey, string $localeCode, string $file, array $options = [])
+    public function importFile(string $apiKey, string $localeCode, string $file, string $format, array $options = [])
     {
-        $translationContent = $this->requestLoco($apiKey, sprintf('export/locale/%s.yml?format=symfony', $localeCode));
+        $translationContent = $this->requestLoco(
+            $apiKey,
+            sprintf('export/locale/%s.yml?format=%s', $localeCode, $format)
+        );
 
         if (
             array_key_exists(TranslationImporter::IMPORT_OPTION_NO_HEADERS, $options) &&

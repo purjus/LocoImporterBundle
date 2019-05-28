@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('key')->end()
                             ->scalarNode('file')->end()
+                            ->scalarNode('format')->end()
                         ->end()
                     ->end()
                 ->end()
