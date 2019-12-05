@@ -5,7 +5,8 @@ namespace Purjus\LocoImporterBundle\Importer;
 final class LocoTranslationImporter implements TranslationImporter
 {
     const DEFAULT_FORMAT = 'symfony';
-    
+    const DEFAULT_STATUS = 'translated';
+
     /** @var string */
     private $kernelRootDir;
     
@@ -35,11 +36,11 @@ final class LocoTranslationImporter implements TranslationImporter
         return $locales;
     }
     
-    public function importFile(string $apiKey, string $localeCode, string $file, string $format, array $options = [])
+    public function importFile(string $apiKey, string $localeCode, string $file, string $format, string $status, array $options = [])
     {
         $translationContent = $this->requestLoco(
             $apiKey,
-            sprintf('export/locale/%s.yml?format=%s', $localeCode, $format)
+            sprintf('export/locale/%s.yml?format=%s&status=%s', $localeCode, $format, $status)
         );
 
         if (
@@ -53,7 +54,14 @@ final class LocoTranslationImporter implements TranslationImporter
         $fileRealPath = realpath($filePath);
 
         if (false === $fileRealPath) {
-            throw new \InvalidArgumentException(sprintf('Error when getting realpath of "%s". Maybe the file does not exists ?', $filePath));
+            if (
+                array_key_exists(TranslationImporter::IMPORT_OPTION_CREATE_FILES, $options) &&
+                $options[TranslationImporter::IMPORT_OPTION_CREATE_FILES]
+            ) {
+                touch($filePath);
+            } else {
+                throw new \InvalidArgumentException(sprintf('Error when getting realpath of "%s". Maybe the file does not exists ?', $filePath));
+            }
         }
 
         $appRealPath = realpath(sprintf('%s/..', $this->kernelRootDir));

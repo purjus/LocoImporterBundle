@@ -30,7 +30,8 @@ class ImportTranslationsCommand extends Command
         $this
             ->setName('purjus:loco:import')
             ->setDescription('Updates translation files from loco')
-            ->addOption(TranslationImporter::IMPORT_OPTION_NO_HEADERS, null, InputOption::VALUE_NONE, 'If set, headers of translation files will be removed');
+            ->addOption(TranslationImporter::IMPORT_OPTION_NO_HEADERS, null, InputOption::VALUE_NONE, 'If set, headers of translation files will be removed')
+            ->addOption(TranslationImporter::IMPORT_OPTION_CREATE_FILES, null, InputOption::VALUE_NONE, 'If set, non existing translation files are created');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -54,15 +55,15 @@ class ImportTranslationsCommand extends Command
         $this->output->writeln(sprintf('%d locales found', count($locales)));
 
         foreach ($locales as $locale) {
-            $this->handleLocale($translationConfig['key'], $locale['code'], $translationConfig['file'], $translationConfig['format'] ?? LocoTranslationImporter::DEFAULT_FORMAT, $options);
+            $this->handleLocale($translationConfig['key'], $locale['code'], $translationConfig['file'], $translationConfig['format'] ?? LocoTranslationImporter::DEFAULT_FORMAT, $translationConfig['status'] ?? LocoTranslationImporter::DEFAULT_STATUS, $options);
         }
     }
 
-    private function handleLocale(string $apiKey, string $localeCode, string $file, string $format, array $options = [])
+    private function handleLocale(string $apiKey, string $localeCode, string $file, string $format, string $status, array $options = [])
     {
         $this->output->writeln(sprintf('Handling locale "%s"', $localeCode));
 
-        if (false === ($filePath = $this->importer->importFile($apiKey, $localeCode, $file, $format, $options))) {
+        if (false === ($filePath = $this->importer->importFile($apiKey, $localeCode, $file, $format, $status, $options))) {
             $this->output->writeln(sprintf('Error while importing file "%s" with locale "%s"', $file, $localeCode));
         }
 
