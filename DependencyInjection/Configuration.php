@@ -9,8 +9,8 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('purjus_loco_importer');
+        $treeBuilder = new TreeBuilder('purjus_loco_importer');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
