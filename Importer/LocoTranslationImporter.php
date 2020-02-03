@@ -59,6 +59,7 @@ final class LocoTranslationImporter implements TranslationImporter
                 $options[TranslationImporter::IMPORT_OPTION_CREATE_FILES]
             ) {
                 touch($filePath);
+                $fileRealPath = realpath($filePath);
             } else {
                 throw new \InvalidArgumentException(sprintf('Error when getting realpath of "%s". Maybe the file does not exists ?', $filePath));
             }
