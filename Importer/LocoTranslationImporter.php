@@ -65,12 +65,6 @@ final class LocoTranslationImporter implements TranslationImporter
             }
         }
 
-        $appRealPath = realpath(sprintf('%s/..', $this->kernelRootDir));
-
-        if (0 !== strpos(realpath($fileRealPath), $appRealPath)) {
-            throw new \InvalidArgumentException(sprintf('Filepath must be in app scope. Can\'t import file in "%s"', $fileRealPath));
-        }
-
         return false !== file_put_contents($fileRealPath, $translationContent) ? $fileRealPath : false;
     }
 }
